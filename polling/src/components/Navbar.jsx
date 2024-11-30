@@ -18,6 +18,12 @@ const Navbar = () => {
             <button className="px-4 py-2 text-black hover:bg-gray-100 font-semibold hover:back rounded">
               <Link to="/view-polls">View Polls</Link>
             </button>
+            <button className="px-4 py-2 text-black hover:bg-gray-100 font-semibold hover:back rounded">
+              <Link to="/leaderboard">Leaderboard</Link>
+            </button>
+            <button className="px-4 py-2 text-black hover:bg-gray-100 font-semibold hover:back rounded">
+              <Link to="/credit-point">Manage Credits</Link>
+            </button>
 
             <button className="px-4 py-2 text-black font-semibold border bg-gray-100  rounded">
               <Link to="/create-poll">Create Poll</Link>

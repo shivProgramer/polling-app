@@ -17,7 +17,7 @@ export default function AllPolls() {
   }, []);
 
   const { allPolls } = useSelector((state) => state.poll);
-  console.log("asll", allPolls);
+  // console.log("asll", allPolls);
 
   function Button({ children, className, ...props }) {
     return (
@@ -31,21 +31,28 @@ export default function AllPolls() {
   }
 
   const currentDate = new Date();
+
+  const normalizeDate = (date) => {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  };
+
+  const normalizedCurrentDate = normalizeDate(currentDate);
+
   const activePolls = allPolls.filter((poll) => {
-    const dueDate = new Date(poll?.dueDate);
-    return dueDate >= currentDate;
+    const dueDate = normalizeDate(new Date(poll?.dueDate));
+    return dueDate >= normalizedCurrentDate;
   });
 
+  console.log("activePolls ---" , activePolls)
   const inactivePolls = allPolls.filter((poll) => {
-    const dueDate = new Date(poll?.dueDate);
-    return dueDate < currentDate;
+    const dueDate = normalizeDate(new Date(poll?.dueDate));
+    return dueDate < normalizedCurrentDate;
   });
 
   const pollFiltersData = activePolls.filter((poll) => {
     return poll.type === pollFilter;
   });
 
-  // Custom Badge component
   function Badge({ children, variant = "primary", className, ...props }) {
     let badgeStyle = "bg-blue-500 text-white";
 
@@ -77,7 +84,7 @@ export default function AllPolls() {
     <div className="flex flex-row">
       {/* Sidebar */}
       <div className="w-full md:w-[13vw] min-h-[100vh] bg-gray-800 text-white p-6 fixed top-0 left-0 shadow-lg">
-        <h2 className="text-3xl font-semibold text-white mb-8">
+        <h2 className="text-3xl font-semibold text-gray-800 mb-8">
           Polls Dashboard
         </h2>
         <ul className="space-y-3">
@@ -135,6 +142,7 @@ export default function AllPolls() {
               </div>
             </div>
             <hr className="py-3" />
+            {/* {console.log("poll", poll)} */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               {activePolls.length > 0 ? (
                 (pollFiltersData.length > 0
@@ -183,7 +191,7 @@ export default function AllPolls() {
                       </p>
                     </div>
                     <div className="p-4 border-t">
-                      <Link to={`/poll?pollId=${poll._id}`} className="w-full">
+                      <Link to={`/poll?pollId=${poll._id}&status=${poll?.status}`} className="w-full">
                         <Button className="w-full">Vote Now</Button>
                       </Link>
                     </div>
@@ -248,7 +256,8 @@ export default function AllPolls() {
                       </p>
                     </div>
                     <div className="p-4 border-t">
-                      <Link to={`/poll?pollId=${poll._id}`} className="w-full">
+                     
+                      <Link to={`/poll?pollId=${poll._id}&status=${poll?.status}`} className="w-full">
                         <Button className="w-full">Vote Now</Button>
                       </Link>
                     </div>

@@ -40,14 +40,23 @@ const storage = multer.diskStorage({
   },
 });
 
+// const fileFilter = (req, file, cb) => {
+//   const allowedImageTypes = ["image/png", "image/jpeg", "image/jpg", ];
+//   if (allowedImageTypes.includes(file.mimetype)) {
+//     cb(null, true); // Accept the file
+//   } else {
+//     cb(new Error("Invalid file type"), false); // Reject the file
+//   }
+// };
+
 const fileFilter = (req, file, cb) => {
-  const allowedImageTypes = ["image/png", "image/jpeg", "image/jpg"];
-  if (allowedImageTypes.includes(file.mimetype)) {
-    cb(null, true); // Accept the file
+  if (file.mimetype.startsWith("image/")) {
+    cb(null, true); 
   } else {
-    cb(new Error("Invalid file type"), false); // Reject the file
+    cb(new Error("Invalid file type. Only images are allowed."), false); // Reject the file
   }
 };
+
 
 const upload = multer({
   storage: storage,

@@ -6,18 +6,27 @@ import Navbar from "./components/Navbar";
 import AllPolls from "./pages/AllPolls";
 import PollDetails from "./pages/PollDetails";
 import Login from "./pages/Login";
+import ProtectedRoute from "./ProtectedRoute";
+import LeaderboardPage from "./pages/LeaderBoars";
+import CreditPointsPage from "./pages/Points";
 
 const App = () => {
   return (
     <Router>
       <Navbar />
       <Routes>
-        {/* Define routes here */}
+        {/* Public routes */}
         <Route path="/" element={<Home />} />
-        <Route path="/create-poll" element={<Createpoll />} />
-        <Route path="/view-polls" element={<AllPolls />} />
-        <Route path="/poll" element={<PollDetails />} />
         <Route path="/login" element={<Login />} />
+
+        {/* Protected routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/create-poll" element={<Createpoll />} />
+          <Route path="/view-polls" element={<AllPolls />} />
+          <Route path="/poll" element={<PollDetails />} />
+          <Route path="/leaderboard" element={<LeaderboardPage />} />
+          <Route path="/credit-point" element={<CreditPointsPage />} />
+        </Route>
       </Routes>
     </Router>
   );

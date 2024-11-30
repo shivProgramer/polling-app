@@ -3,6 +3,8 @@
 import { useState, FormEvent } from "react";
 import { useDispatch } from "react-redux";
 import { userLogin } from "../Slices/pollSlice";
+import { useNavigate } from "react-router-dom";
+import { SuccessMsg } from "../../Toaster";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -10,33 +12,52 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setLoading(true);
+    setError(""); // Clear any previous error messages
+    setLoading(true); // Show loading indicator
 
     try {
+      // Make the login request
       const response = await fetch(
         "https://inhouse2.digitalsnug.com/API/Account/login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({ email, password }), // Send email and password
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Login failed");
-      }
-
+      // Parse the response body as JSON
       const data = await response.json();
-      console.log("Login successful:", data);
-      dispatch(userLogin(data.userInfo));
-    } catch {
-      setError("Invalid email or password");
+
+      // If status is "1", the login is successful
+      if (data.status === "1") {
+        // Save token and user info in localStorage
+        localStorage.setItem("token", data?.key);
+        localStorage.setItem("userInfo", JSON.stringify(data?.userInfo));
+
+        // Dispatch action to update user login state in Redux (if you're using Redux)
+        dispatch(userLogin(data?.userInfo));
+
+        // Show success message
+        SuccessMsg({ msg: "Login Successfully" });
+
+        // Navigate to home page ("/")
+        navigate("/");
+      } else {
+        // If status is "0", login failed
+        ErrorMsg({ msg: data.message || "Login Failed. Invalid Credentials." });
+        navigate("/login"); // Optionally redirect back to login page
+      }
+    } catch (error) {
+      // Catch any errors that occur during the fetch request
+      console.error("Login error:", error);
+      setError("Invalid email or password"); // Display generic error message
     } finally {
-      setLoading(false);
+      setLoading(false); // Set loading state to false once done
     }
   };
 

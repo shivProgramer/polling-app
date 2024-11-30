@@ -1,12 +1,10 @@
 const Vote = require("../models/Vote.model.js");
 const Poll = require("../models/Poll.model.js");
 
-// Create a vote
 const createVote = async (req, res) => {
-  const { pollId, userId, response, responseType } = req.body;
+  const { pollId, userId, response, responseType, votedFor } = req.body;
 
   try {
-    // Ensure the poll exists
     const poll = await Poll.findById(pollId);
     if (!poll) {
       return res
@@ -14,21 +12,20 @@ const createVote = async (req, res) => {
         .json({ success: false, message: "Poll not found" });
     }
 
-    // Check if the user has already voted on this poll
     const existingVote = await Vote.findOne({ pollId, userId });
     if (existingVote) {
       return res.status(400).json({
         success: false,
-        message: "User has already voted on this poll",
+        message: "You have already voted",
       });
     }
 
-    // Create and save the vote
     const newVote = new Vote({
       pollId,
       userId,
       response,
       responseType,
+      votedFor,
     });
 
     await newVote.save();
@@ -64,14 +61,11 @@ const getVotesByPoll = async (req, res) => {
 
 // Get all votes by a user
 const getVotesByUser = async (req, res) => {
-  const { userId } = req.params;
+  const { userId, pollId } = req.body;
 
   try {
     // Find all votes by the given user
-    const votes = await Vote.find({ userId }).populate(
-      "pollId",
-      "pollTitle pollDescription"
-    );
+    const votes = await Vote.find({ userId, pollId: pollId });
     return res.status(200).json({ success: true, data: votes });
   } catch (error) {
     console.error("Error fetching user votes:", error);

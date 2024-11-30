@@ -32,6 +32,7 @@ const userSchema = new mongoose.Schema(
       ref: "User",
       default: null,
     },
+    creditPoints: { type: Number, default: 0 },
     profilePath: { type: String, default: null },
     workingFor: { type: String, default: null },
     isThirdPartyAdmin: { type: Boolean, default: false },

@@ -1,5 +1,6 @@
 const { createSuccess } = require("../message.js");
 const Poll = require("../models/Poll.model.js");
+const Vote = require("../models/Vote.model.js");
 
 const createPoll = async (req, res) => {
   try {
@@ -93,8 +94,10 @@ const getPollById = async (req, res) => {
 // Delete a poll by ID
 const deletePoll = async (req, res) => {
   const { id } = req.params;
+
+  console.log("id", id);
   try {
-    const deletedPoll = await Poll.findByIdAndDelete(id);
+    const deletedPoll = await Poll.findByIdAndDelete({ _id: id });
     if (!deletedPoll) {
       return res
         .status(404)
@@ -109,9 +112,57 @@ const deletePoll = async (req, res) => {
   }
 };
 
+const getLeaderboardByPoll = async (req, res) => {
+  try {
+    const { pollId } = req.params;
+
+    // Fetch the poll data and all votes for the specific poll
+    const Polldata = await Poll.findById({ _id: pollId });
+    const allVotes = await Vote.find({ pollId: Polldata._id });
+
+    console.log("Polldata", Polldata);
+    console.log("allVotes", allVotes);
+
+    // Map the image files to calculate votes and points
+    const leaderboardData = Polldata.imageFiles.map((image) => {
+      // Find all votes that match this image
+      const imageVotes = allVotes.filter(
+        (vote) => vote.response.toString() === image._id.toString()
+      );
+
+      // Calculate total points as the number of votes * points for the poll
+      const totalVotes = imageVotes.length;
+      const points = totalVotes * Polldata.points;
+
+      return {
+        username: image.fileName.split(".")[0], // The file name of the image
+        totalVotes, // Total votes for this image
+        points, // Total points for this image (votes * poll's points)
+        imageUrl: image.url, // URL of the image file (if needed)
+      };
+    });
+
+    // Send the response with the leaderboard data
+    res.status(200).json(
+      createSuccess({
+        msg: "Poll leaderboard fetched successfully",
+        data: { leaderboardData },
+      })
+    );
+  } catch (error) {
+    console.error("Error fetching poll leaderboard:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch poll leaderboard",
+      error,
+    });
+  }
+};
+
 module.exports = {
   createPoll,
   getAllPolls,
   deletePoll,
   getPollById,
+  getLeaderboardByPoll,
 };

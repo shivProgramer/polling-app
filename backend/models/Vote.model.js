@@ -8,8 +8,8 @@ const voteSchema = new mongoose.Schema(
       required: true,
     },
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      // jinhone vote kiya hai
+      type: Number,
       required: true,
     },
     response: {
@@ -25,6 +25,10 @@ const voteSchema = new mongoose.Schema(
     votedAt: {
       type: Date,
       default: Date.now,
+    },
+    votedFor: {
+      type: String,
+      required: true,
     },
   },
   { timestamps: true } // Adds `createdAt` and `updatedAt`
